@@ -1,0 +1,30 @@
+- name: deploy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    env: sandpit
+    build: 1
+    Owner: david@xirus.com.au
+    region: ap-southeast-2
+
+    tags:
+      Environment: "{{ env }}"
+      Owner: "{{ Owner }}"
+
+  tasks:
+
+  - name: Execute Troposphere script
+    script: organization.py
+    args:
+      executable: python3
+
+  - name: Deploy Cloudformation template
+    cloudformation:
+      stack_name: "{{ env }}-{{ build }}"
+      state: present
+      region: "{{ region }}"
+      template: "cfn.yaml"
+      disable_rollback: true
+      tags: "{{ tags }}"
